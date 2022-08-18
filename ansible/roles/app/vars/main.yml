@@ -1,4 +1,0 @@
----
-# vars file for roles/app
-user: deploy-user
-passwd: 1234
