@@ -1,0 +1,7 @@
+---
+- hosts: app-server
+  become: true
+  become_user: root
+  roles:
+    - app
+

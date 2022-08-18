@@ -1,0 +1,61 @@
+---
+# tasks file for roles/app
+- name: update system
+  yum: name=* state=latest
+
+- name: install pip
+  yum: name=python3-pip state=latest
+
+- name: Install OpenJDK 11
+  yum: name=java-11-openjdk-devel state=latest
+
+- name: install lxml python lib
+  command: pip3 install lxml
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: add petclinic user
+  user: name=petclinic group=adm create_home=no  
+
+- name: Create petclinic dir
+  file:
+    path: /opt/petclinic
+    state: directory
+
+- name: Download latest artifact
+  community.general.maven_artifact:
+    group_id: org.springframework.samples
+    artifact_id: spring-petclinic
+    version: 2.7.0-SNAPSHOT
+    repository_url: 'http://34.116.143.12:8081/repository/maven-nexus-repo/'
+    username: "{{ user }}"
+    password: "{{ passwd }}"
+    dest: /opt/petclinic/petclinic.jar
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: copy startup script
+  copy:
+    src: files/wrapper.sh
+    dest: /opt/petclinic/wrapper.sh
+    owner: petclinic
+    mode: '0644'
+
+- name: give wrapper.sh execution perm
+  file: dest=/opt/petclinic/wrapper.sh mode=a+x
+
+- name: set ownership for petclinic folder
+  command: chown -R petclinic:petclinic /opt/petclinic
+
+- name: create systemd service
+  copy: 
+    src: ./templates/petclinic.service
+    dest: /etc/systemd/system/petclinic.service
+    owner: petclinic
+
+- name: reload systemctl and start petclinic
+  systemd:
+    name: petclinic.service
+    daemon_reload: yes
+    enabled: yes
+    state: started
