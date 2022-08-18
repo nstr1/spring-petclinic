@@ -7,6 +7,13 @@ pipeline {
     }
 
     stages {
+        stage('Checkout SCM') {
+            steps {
+                git branch: 'main',
+                credentialsId: 'github_creds',
+                url: 'https://github.com/nstr1/spring-petclinic/'
+            }
+        }
         stage('Maven Build'){
             steps{
                 sh "./mvnw package -Dmaven.test.skip"
@@ -47,6 +54,11 @@ pipeline {
                 }
             }
 
+    }
+    stage("Deploy app with ansible") {
+        steps {
+            sh "ansible -m ping app-server"
+        }
     }
 }
 }
