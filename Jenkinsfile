@@ -57,6 +57,7 @@ pipeline {
     }
     stage("Deploy app with ansible") {
         steps {
+            sh "cd /home/jenkins/ansible"
             sh "ansible -m ping app-server"
         }
     }
