@@ -2,14 +2,13 @@ pipeline {
     agent { label 'agent1' }
 
     tools {
-        // Install the Maven version configured as "M3" and add it to the path.
         maven "M3"
     }
 
     stages {
         stage('Maven Build'){
             steps{
-                sh "./mvnw clean package -Dmaven.test.skip"
+                sh "mvn clean package -Dmaven.test.skip"
             }
         }
         stage("Publish to Nexus Repository Manager") {
