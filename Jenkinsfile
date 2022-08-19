@@ -57,7 +57,12 @@ pipeline {
     }
     stage("Deploy app with ansible") {
         steps {
-            sh "ansible -i /home/jenkins/ansible/inventory/dev-inventory -m ping app-server"
+            sh """
+                ansible 
+                -i /home/jenkins/ansible/inventory/dev-inventory 
+                -m ping app-server 
+                --key-file /home/jenkins/ansible/.ssh/app-key
+               """
         }
     }
 }
