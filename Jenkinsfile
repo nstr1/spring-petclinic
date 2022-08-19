@@ -57,9 +57,7 @@ pipeline {
     }
     stage("Deploy app with ansible") {
         steps {
-            sh "cd /home/jenkins/ansible"
-            sh "pwd"
-            sh "ansible -m ping app-server"
+            sh "ansible -i /home/jenkins/ansible/inventory/dev-inventory -m ping app-server"
         }
     }
 }
