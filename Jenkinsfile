@@ -15,7 +15,6 @@ pipeline {
     stages {
         stage('Maven Build'){
             steps{
-                sh "echo ${NEXUS_URL}"
                 sh "./mvnw clean package -Dmaven.test.skip"
             }
         }
