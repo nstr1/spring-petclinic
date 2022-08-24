@@ -4,6 +4,13 @@ pipeline {
     tools {
         maven "M3"
     }
+    environment {
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "http"
+        NEXUS_URL = "${NEXUS_URL}" <--
+        NEXUS_REPOSITORY = "maven-nexus-repo"
+        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID} <--
+    }
 
     stages {
         stage('Maven Build'){
@@ -22,13 +29,13 @@ pipeline {
                     if(artifactExists) {
                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
                         nexusArtifactUploader(
-                            nexusVersion: "nexus3",
-                            protocol: "HTTP",
-                            nexusUrl: "34.116.143.12:8081",
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
                             groupId: pom.groupId,
                             version: pom.version,
-                            repository: "maven-nexus-repo",
-                            credentialsId: "jenkins-user",
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
