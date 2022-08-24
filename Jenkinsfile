@@ -7,14 +7,15 @@ pipeline {
     environment {
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "${NEXUS_URL}" <--
+        NEXUS_URL = "${NEXUS_URL}" 
         NEXUS_REPOSITORY = "maven-nexus-repo"
-        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID} <--
+        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
     }
 
     stages {
         stage('Maven Build'){
             steps{
+                sh "echo ${NEXUS_URL}"
                 sh "./mvnw clean package -Dmaven.test.skip"
             }
         }
