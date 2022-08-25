@@ -15,7 +15,8 @@ pipeline {
     stages {
         stage('Maven Build'){
             steps{
-                sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip"
+                sh "echo $NEXUS_URL"
+                sh "mvn clean package -Dmaven.test.skip"
             }
         }
         stage("Publish to Nexus Repository Manager") {
@@ -53,13 +54,13 @@ pipeline {
                 }
             }
 
+        }
     }
-    stage("Deploy app with ansible") {
-        steps {
+    post {
+        success {
             ws('/home/jenkins/ansible') {
                 sh "ansible-playbook playbooks/app-deploy.yaml"
             }
         }
     }
-}
 }
