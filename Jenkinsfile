@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Maven Build'){
             steps{
-                sh "./mvnw clean package -Dmaven.test.skip"
+                sh "./mvnw clean package -Dmaven.test.skip -Dcheckstyle.skip"
             }
         }
         stage("Publish to Nexus Repository Manager") {
