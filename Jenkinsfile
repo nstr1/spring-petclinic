@@ -55,11 +55,11 @@ pipeline {
             }
 
         }
-    }
-    post {
-        success {
-            ws('/home/jenkins/ansible') {
+        stage("Deploy to app-server"){
+            steps{
+                ws('/home/jenkins/ansible') {
                 sh "ansible-playbook playbooks/app-deploy.yaml"
+                }
             }
         }
     }
