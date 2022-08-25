@@ -252,6 +252,10 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>nexus</id>
+      <url>http://34.116.143.12:8081/repository/maven-proxy-repo/</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
