@@ -57,8 +57,8 @@ pipeline {
         stage("Deploy to app-server"){
             steps{
                 ws('/home/jenkins/ansible') {
-                    sh "cat secret.txt"
-                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file secret.txt"
+                    sh "echo '${VAULT_PASS}' > .secret.txt"
+                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt"
                     sh "rm secret.txt"
                 }
             }
