@@ -28,7 +28,7 @@ pipeline {
         }
         stage("Push to Nexus repository") {
             steps{
-                sh "docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
+                sh "docker login $NEXUS_URL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
