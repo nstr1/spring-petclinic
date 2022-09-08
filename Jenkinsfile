@@ -10,6 +10,8 @@ pipeline {
         NEXUS_URL = "${NEXUS_URL}" 
         NEXUS_REPOSITORY = "image-repo"
         NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
+        DOCKER_USERNAME = "${DOCKER_USERNAME}"
+        DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
 
     stages {
@@ -23,9 +25,10 @@ pipeline {
                 sh "docker image build -t $NEXUS_URL/petclinic:latest -t $NEXUS_URL/petclinic:\$(git log -1 --pretty=%h) ."
             }
         }
-        stage("Push to Nexus Repository Manager") {
+        stage("Push to Nexus repository") {
             steps{
-                sh "docker push ${NEXUS_URL}/petclinic --all-tags"
+                sh "docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
+                sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
     }
