@@ -23,11 +23,11 @@ pipeline {
                 sh "docker image build -t $NEXUS_URL/petclinic:latest -t $NEXUS_URL/petclinic:\$(git log -1 --pretty=%h) ."
             }
         }
-        // stage("Push to Nexus Repository Manager") {
-        //     steps{
-        //         sh "docker push ${NEXUS_URL}/petclinic --all-tags"
-        //     }
-        // }
+        stage("Push to Nexus Repository Manager") {
+            steps{
+                sh "docker push ${NEXUS_URL}/petclinic --all-tags"
+            }
+        }
     }
     post {
         success {
