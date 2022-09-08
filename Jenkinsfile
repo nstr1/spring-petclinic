@@ -15,6 +15,7 @@ pipeline {
     stages {
         stage("Maven Build"){
             steps{
+                sh "whoami"
                 sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip"
             }
         }
