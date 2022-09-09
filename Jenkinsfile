@@ -32,6 +32,13 @@ pipeline {
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
+        stage("Deploy to app-server"){
+            steps{
+                sh "echo '${VAULT_PASS}' > .secret.txt"
+                sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt"
+                sh "rm .secret.txt"
+            }
+        }
     }
     post {
         success {
