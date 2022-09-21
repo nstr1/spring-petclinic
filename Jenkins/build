@@ -12,23 +12,17 @@ pipeline {
         NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
-        VERSION = "\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
     }
 
     stages {
         stage("Maven Build"){
             steps{
-                sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip"
-            }
-        }
-        stage("Increment version(patch)"){
-            steps{
-                sh "mvn help:evaluate -Dexpression=project.version -q -DforceStdout"
+                sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip -DbumpMinor"
             }
         }
         stage("Docker Build and Tag"){
             steps{
-                sh "docker image build -t $NEXUS_URL/petclinic:$VERSION ."
+                sh "docker image build -t $NEXUS_URL/petclinic:\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) ."
             }
         }
         stage("Push to Nexus repository") {
