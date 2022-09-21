@@ -17,7 +17,12 @@ pipeline {
     stages {
         stage("Maven Build"){
             steps{
-                sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip -DbumpMinor"
+                sh "mvn clean package -Dmaven.test.skip"
+            }
+        }
+        stage("Increment Maven verison(minor)"){
+            steps{
+                sh "mvn validate -DbumpPatch"
             }
         }
         stage("Docker Build and Tag"){
