@@ -21,6 +21,11 @@ pipeline {
                 sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip"
             }
         }
+        stage("Increment version(patch)"){
+            steps{
+                sh "mvn help:evaluate -Dexpression=project.version -q -DforceStdout"
+            }
+        }
         stage("Docker Build and Tag"){
             steps{
                 sh "docker image build -t $NEXUS_URL/petclinic:$VERSION ."
