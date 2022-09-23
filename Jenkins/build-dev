@@ -15,14 +15,14 @@ pipeline {
     }
 
     stages {
-        stage("Maven Build"){
+        stage("Maven Test and Package"){
             steps{
                 sh "mvn clean package"
             }
         }
         stage("Increment Maven verison(minor)"){
             steps{
-                sh "mvn validate -DbumpPatch"
+                sh "mvn validate -DbumpMinor"
             }
         }
         stage("Docker Build and Tag"){
