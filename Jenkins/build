@@ -17,7 +17,7 @@ pipeline {
     stages {
         stage("Maven Build"){
             steps{
-                sh "mvn clean package -Dmaven.test.skip"
+                sh "mvn clean package"
             }
         }
         stage("Increment Maven verison(minor)"){
