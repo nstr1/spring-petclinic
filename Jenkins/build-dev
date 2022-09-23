@@ -12,30 +12,47 @@ pipeline {
         NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
+        VERSION = "$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
     }
 
     stages {
-        stage("Maven Test and Package"){
+        stage("Maven Build"){
             steps{
                 sh "mvn clean package"
             }
         }
-        stage("Increment Maven verison(minor)"){
-            steps{
-                sh "mvn validate -DbumpMinor"
-            }
-        }
         stage("Docker Build and Tag"){
             steps{
-                sh "docker image build -t $NEXUS_URL/petclinic:\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) ."
+                sh "docker image build -t $NEXUS_URL/petclinic:$VERSION ."
             }
         }
-        stage("Push to Nexus repository") {
+        stage("Push Docker image to Nexus repository") {
             steps{
                 sh "docker login $NEXUS_URL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
+        stage("Push Maven Snapshot to Nexus repository") {
+            steps{
+                sh "mvn deploy -Dmaven.test.skip=true"
+            }
+        }
+        stage("Prune local Docker images") {
+            steps{
+                sh "docker image prune -a"
+            }
+        }
+        /*
+        stage("Deploy to app-server"){
+            steps{
+                ws('/home/jenkins/ansible') {
+                    sh "echo '${VAULT_PASS}' > .secret.txt"
+                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt"
+                    sh "rm .secret.txt"
+                }
+            }
+        }
+        */
     }
     post {
         success {
