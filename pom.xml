@@ -12,6 +12,13 @@
   </parent>
   <name>petclinic</name>
 
+  <distributionManagement>
+    <snapshotRepository>
+       <id>nexus</id>
+       <url>http://10.0.0.66:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
+ </distributionManagement>
+
   <properties>
 
     <!-- Generic properties -->
@@ -130,7 +137,7 @@
         </executions>
         <configuration>
            <serverId>nexus</serverId>
-           <nexusUrl>http://localhost:8081/nexus/</nexusUrl>
+           <nexusUrl>http://10.0.0.66:8081/repository/maven-snapshots</nexusUrl>
            <skipStaging>true</skipStaging>
         </configuration>
      </plugin>
