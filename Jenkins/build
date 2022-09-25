@@ -15,7 +15,7 @@ pipeline {
     }
 
     stages {
-    stage("Trigger deploy job"){
+        stage("Test deploy job"){
             steps{
                  build job: 'deploy'
             }
