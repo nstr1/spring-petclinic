@@ -48,7 +48,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version',value: '2.12.0-SNAPSHOT')] , wait: false
             }
         }
     }
