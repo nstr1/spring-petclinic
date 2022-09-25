@@ -1,0 +1,58 @@
+pipeline {
+    agent { label 'agent1' }  
+
+    tools {
+        maven "M3"
+    }
+    environment {
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "http"
+        NEXUS_URL = "${NEXUS_URL}" 
+        NEXUS_REPOSITORY = "image-repo"
+        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
+        DOCKER_USERNAME = "${DOCKER_USERNAME}"
+        DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
+    }
+
+    stages {
+        stage("Maven Test and Build"){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+        stage("Docker Build and Tag"){
+            steps{
+                sh "docker image build -t $NEXUS_URL/petclinic:\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) ."
+            }
+        }
+        stage("Push Docker image to Nexus repository") {
+            steps{
+                sh "docker login $NEXUS_URL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
+                sh "docker push $NEXUS_URL/petclinic --all-tags"
+            }
+        }
+        stage("Push Maven Snapshot to Nexus repository") {
+            steps{
+                sh "mvn deploy -Dmaven.test.skip=true"
+            }
+        }
+        stage("Prune local Docker images") {
+            steps{
+                sh "docker image prune -a"
+            }
+        }
+        stage("Trigger deploy job"){
+            steps{
+                 build job: 'deploy'
+            }
+        }
+    }
+    post {
+        success {
+            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+        failure {
+            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+    }
+}
