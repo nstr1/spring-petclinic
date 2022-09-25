@@ -15,6 +15,11 @@ pipeline {
     }
 
     stages {
+    stage("Trigger deploy job"){
+            steps{
+                 build job: 'deploy'
+            }
+        }
         stage("Maven Test and Build"){
             steps{
                 sh "mvn clean package"
