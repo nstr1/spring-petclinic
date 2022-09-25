@@ -15,11 +15,6 @@ pipeline {
     }
 
     stages {
-        stage("Test deploy job"){
-            steps{
-                 build job: 'petclinic-deploy', wait: false
-            }
-        }
         stage("Maven Test and Build"){
             steps{
                 sh "mvn clean package"
@@ -53,7 +48,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'deploy'
+                 build job: 'petclinic-deploy', wait: false
             }
         }
     }
