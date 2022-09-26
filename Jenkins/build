@@ -5,12 +5,8 @@ pipeline {
         maven "M3"
     }
     environment {
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
         NEXUS_URL = "${NEXUS_URL}" 
-        NEXUS_REPOSITORY = "image-repo"
-        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
-        GITHUB_CREDEDENTIAL_ID = "${GITHUB_CREDEDENTIAL_ID}"
+        GITHUB_CREDENTIAL_ID = "${GITHUB_CREDEDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
