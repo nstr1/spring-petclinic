@@ -6,7 +6,7 @@ pipeline {
     }
     environment {
         NEXUS_URL = "${NEXUS_URL}" 
-        GITHUB_CREDENTIAL_ID = "${GITHUB_CREDEDENTIAL_ID}"
+        GITHUB_CREDENTIAL_ID = "${GITHUB_CREDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
