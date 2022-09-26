@@ -21,13 +21,13 @@ pipeline {
                 sh "mvn clean package"
             }
         }
-        stage("Increment artifact version and update repo pom.xml"){
+        stage("Increment artifact version and update POM"){
             steps{
                 sh "mvn validate -DbumpMinor"
                 withCredentials([usernamePassword(credentialsId: 'github_creds', passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "git add pom.xml"
                     sh "git commit -m \"Increment pom.xml\""
-                    sh "git push https://$user:$pass@github.com/nstr1/spring-petclinic.git dev"
+                    sh "git push https://$user:$pass@github.com/nstr1/spring-petclinic.git dev --force"
                 }
             }
         }
