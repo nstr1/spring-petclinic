@@ -21,14 +21,15 @@ pipeline {
                 sh "mvn clean package"
             }
         }
-        stage("Increment artifact version and update pom.xml"){
+        stage("Increment artifact version and update repo pom.xml"){
             steps{
                 sh "mvn validate -DbumpMinor"
                 sh "VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
-                GIT_CREDS = credentials($GITHUB_CREDEDENTIAL_ID)
-                sh "git add pom.xml"
-                sh "git commit -m \"Increment pom.xml\""
-                sh "git push https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@github.com:nstr1/spring-petclinic.git dev"
+                withCredentials([usernamePassword(credentialsId: 'github_creds', passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git add pom.xml"
+                    sh "git commit -m \"Increment pom.xml\""
+                    sh "git push https://$user:$pass@github.com:nstr1/spring-petclinic.git dev"
+                }
             }
         }
         stage("Docker Build and Tag"){
