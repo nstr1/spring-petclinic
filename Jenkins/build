@@ -10,6 +10,7 @@ pipeline {
         NEXUS_URL = "${NEXUS_URL}" 
         NEXUS_REPOSITORY = "image-repo"
         NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
+        GITHUB_CREDEDENTIAL_ID = "${GITHUB_CREDEDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
@@ -24,10 +25,10 @@ pipeline {
             steps{
                 sh "mvn validate -DbumpMinor"
                 sh "VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
+                GIT_CREDS = credentials($GITHUB_CREDEDENTIAL_ID)
                 sh "git add pom.xml"
-                sh "git commit -m \"Incremented artifact version to \$VERSION\""
-                sh "git checkout dev"
-                sh "git push"
+                sh "git commit -m \"Increment pom.xml\""
+                sh "git push https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@github.com:nstr1/spring-petclinic.git dev"
             }
         }
         stage("Docker Build and Tag"){
