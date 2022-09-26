@@ -20,14 +20,19 @@ pipeline {
                 sh "mvn clean package"
             }
         }
-        stage("Increment artifact version(minor)"){
+        stage("Increment artifact version and update pom.xml"){
             steps{
                 sh "mvn validate -DbumpMinor"
+                sh "VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
+                sh "git add pom.xml"
+                sh "git commit -m \"Incremented artifact version to \$VERSION\""
+                sh "git checkout dev"
+                sh "git push"
             }
         }
         stage("Docker Build and Tag"){
             steps{
-                sh "docker image build -t $NEXUS_URL/petclinic:\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) ."
+                sh "docker image build -t $NEXUS_URL/petclinic:\$VERSION ."
             }
         }
         stage("Push Docker image to Nexus repository") {
@@ -48,7 +53,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', parameters:[string(name: 'version',value: '2.12.0-SNAPSHOT')] , wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version',value: '$VERSION')] , wait: false
             }
         }
     }
