@@ -23,8 +23,8 @@ pipeline {
         }
         stage("Increment artifact version and update POM"){
             steps{
-                sh "mvn validate -DbumpMinor"
-                withCredentials([usernamePassword(credentialsId: 'github_creds', passwordVariable: 'pass', usernameVariable: 'user')]) {
+                sh "mvn validate -DbumpMinor"           
+                withCredentials([usernamePassword(credentialsId: $GITHUB_CREDEDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "git add pom.xml"
                     sh "git commit -m \"Increment pom.xml\""
                     sh "git push https://$user:$pass@github.com/nstr1/spring-petclinic.git"
@@ -39,7 +39,7 @@ pipeline {
         stage("Docker Build and Tag"){
             steps{
                 sh "VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
-                sh "docker image build -t $NEXUS_URL/petclinic:\$VERSION ."
+                sh "docker image build -t $NEXUS_URL/petclinic:$VERSION ."
             }
         }
         stage("Push Docker image to Nexus repository") {
