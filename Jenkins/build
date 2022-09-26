@@ -24,16 +24,21 @@ pipeline {
         stage("Increment artifact version and update repo pom.xml"){
             steps{
                 sh "mvn validate -DbumpMinor"
-                sh "VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
                 withCredentials([usernamePassword(credentialsId: 'github_creds', passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "git add pom.xml"
                     sh "git commit -m \"Increment pom.xml\""
-                    sh "git push https://$user:$pass@github.com:nstr1/spring-petclinic.git dev"
+                    sh "git push https://$user:$pass@github.com/nstr1/spring-petclinic.git dev"
                 }
+            }
+        }
+        stage("Push Maven Snapshot to Nexus repository") {
+            steps{
+                sh "mvn deploy -Dmaven.test.skip=true"
             }
         }
         stage("Docker Build and Tag"){
             steps{
+                sh "VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
                 sh "docker image build -t $NEXUS_URL/petclinic:\$VERSION ."
             }
         }
@@ -43,11 +48,6 @@ pipeline {
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
-        stage("Push Maven Snapshot to Nexus repository") {
-            steps{
-                sh "mvn deploy -Dmaven.test.skip=true"
-            }
-        }
         stage("Prune local Docker images") {
             steps{
                 sh "docker image prune -a"
@@ -55,7 +55,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', parameters:[string(name: 'version',value: '$VERSION')] , wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: '$VERSION')] , wait: false
             }
         }
     }
