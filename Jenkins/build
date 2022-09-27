@@ -12,9 +12,19 @@ pipeline {
     }
 
     stages {
-        stage("Maven Build and Deploy to Neus"){
+        stage("Check git tag, increment version, create new tag"){
             steps{
-                sh "mvn clean deploy -DbumpMinor"
+                echo "$TAG_NAME"
+            }
+        }
+        stage("Maven Test and Build"){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+        stage("Push .jar artifact to Nexus"){
+            steps{
+                sh "mvn clean deploy"
             }
         }
         stage("Docker Build and Tag"){
