@@ -14,7 +14,10 @@ pipeline {
     stages {
         stage("Check git tag, increment version, create new tag"){
             steps{
-                echo "{$TAG_NAME}"
+                env.TAG = sh(returnStdout:  true, script: "git tag --sort=-creatordate | head -n 1").trim()
+                sh "echo ${TAG}"
+                // sh "git ${TAG}"
+                // sh "git push origin --tags"      
             }
         }
         stage("Maven Test and Build"){
