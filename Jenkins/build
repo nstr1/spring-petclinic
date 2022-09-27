@@ -14,7 +14,9 @@ pipeline {
     stages {
         stage("Check git tag, increment version, create new tag"){
             steps{
-                env.TAG = sh(returnStdout:  true, script: "git tag --sort=-creatordate | head -n 1").trim()
+                script{
+                    env.TAG = sh(returnStdout:  true, script: "git tag --sort=-creatordate | head -n 1").trim()
+                }
                 sh "echo ${TAG}"
                 // sh "git ${TAG}"
                 // sh "git push origin --tags"      
