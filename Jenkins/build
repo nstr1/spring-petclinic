@@ -14,12 +14,7 @@ pipeline {
     stages {
         stage("Maven Test and Build"){
             steps{
-                sh "mvn clean package"
-            }
-        }
-        stage("Increment artifact version and update POM"){
-            steps{
-                sh "mvn validate -DbumpMinor"           
+                sh "mvn clean package -DbumpMinor"
             }
         }
         stage("Push Maven Snapshot to Nexus repository") {
