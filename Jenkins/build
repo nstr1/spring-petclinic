@@ -35,7 +35,7 @@ pipeline {
         stage("Docker Build and Tag"){
             steps{
                 sh "export VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
-                sh "docker image build -t $NEXUS_URL/petclinic:$VERSION ."
+                sh "docker image build -t $NEXUS_URL/petclinic:env.VERSION ."
             }
         }
         stage("Push Docker image to Nexus repository") {
