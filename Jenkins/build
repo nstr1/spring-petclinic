@@ -33,6 +33,7 @@ pipeline {
                     pom = readMavenPom file: 'pom.xml'
                     env.VERSION = pom.version
                 }
+                sh "ls target"
                 sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
             }
         }
