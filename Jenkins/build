@@ -29,7 +29,8 @@ pipeline {
         }
         stage("Docker Build and Tag"){
             steps{
-                sh "export VERSION=\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" 
+                pom = readMavenPom file: 'pom.xml'
+                env.VERSION = pom.version
                 sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
             }
         }
