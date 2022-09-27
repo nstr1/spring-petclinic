@@ -12,14 +12,9 @@ pipeline {
     }
 
     stages {
-        stage("Maven Test and Build"){
+        stage("Maven Build and Deploy to Neus"){
             steps{
-                sh "mvn clean package -DbumpMinor"
-            }
-        }
-        stage("Push Maven Snapshot to Nexus repository") {
-            steps{
-                sh "mvn deploy -Dmaven.test.skip=true"
+                sh "mvn clean deploy -DbumpMinor"
             }
         }
         stage("Docker Build and Tag"){
