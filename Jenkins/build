@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage("Check git tag, increment version, create new tag"){
             steps{
-                echo "$TAG_NAME"
+                echo "{$TAG_NAME}"
             }
         }
         stage("Maven Test and Build"){
