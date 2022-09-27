@@ -23,7 +23,6 @@ pipeline {
                     pom = readMavenPom file: 'pom.xml'
                     env.VERSION = pom.version
                 }
-                sh "ls target"
                 sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
             }
         }
@@ -46,10 +45,10 @@ pipeline {
     }
     post {
         success {
-            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.VERSION}-${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         failure {
-            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.VERSION}-${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
     }
 }
