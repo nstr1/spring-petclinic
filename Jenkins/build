@@ -23,7 +23,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "git add pom.xml"
                     sh "git commit -m \"Increment pom.xml\""
-                    sh "git push"
+                    sh "git push https://$user:$pass@github.com/nstr1/spring-petclinic.git"
                 }
             }
         }
