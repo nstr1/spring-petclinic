@@ -15,7 +15,7 @@ pipeline {
         stage("Check git tag, increment version, create new tag"){
             steps{
                 script{
-                    env.TAG = sh(returnStdout:  true, script: "git tag --sort=-creatordate | head -n 1").trim()
+                    env.TAG = sh(returnStdout:  true, script: "git describe --tags --abbrev=0").trim()
                 }
                 sh "echo ${TAG}"
                 // sh "git ${TAG}"
@@ -60,10 +60,10 @@ pipeline {
     }
     post {
         success {
-            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.VERSION}-${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
         failure {
-            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.VERSION}-${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
     }
 }
