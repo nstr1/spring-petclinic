@@ -33,6 +33,7 @@ pipeline {
                 }        
                 sh "git tag ${VERSION}"
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git remote set-url origin https://github.com/nstr1/spring-petclinic.git"
                     sh "git push origin --tags"
                 }
             }
