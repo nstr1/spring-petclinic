@@ -22,7 +22,7 @@ pipeline {
         }
         stage("Maven Test and Build"){
             steps{
-                sh "mvn clean package -DbumpMinor"
+                sh "mvn clean package -Dmaven.test.skip -DbumpMinor"
             }
         }
         stage("Update git tag"){
@@ -34,7 +34,7 @@ pipeline {
                 sh "git tag ${VERSION}"
                 
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
-                    sh "git remote set-url origin https://$user:$pass@github.com/$user/project.git"
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
                     sh "git push origin --tags"
                 }
             }
