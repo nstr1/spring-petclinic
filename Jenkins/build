@@ -32,7 +32,9 @@ pipeline {
                     env.VERSION = pom.version
                 }        
                 sh "git tag ${VERSION}"
-                sh "git push origin --tags"
+                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git push origin --tags"
+                }
             }
         }
         stage("Push .jar artifact to Nexus"){
