@@ -22,7 +22,7 @@ pipeline {
         }
         stage("Maven test and build"){
             steps{
-                sh "mvn clean package -DbumpMinor"
+                sh "mvn clean deploy -DbumpMinor"
             }
         }
         stage("Update git tag"){
@@ -37,11 +37,6 @@ pipeline {
                     sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
                     sh "git push origin --tags"
                 }
-            }
-        }
-        stage("Maven push artifact to Nexus"){
-            steps{
-                sh "mvn deploy"
             }
         }
         stage("Docker Build and Tag"){
