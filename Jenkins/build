@@ -20,9 +20,9 @@ pipeline {
                 sh "mvn versions:set -DnewVersion=${GIT_TAG}"
             }
         }
-        stage("Maven test, build and push artifact to Nexus"){
+        stage("Maven test and build"){
             steps{
-                sh "mvn clean deploy -Dmaven.test.skip -DbumpMinor"
+                sh "mvn clean packcage -Dmaven.test.skip -DbumpMinor"
             }
         }
         stage("Update git tag"){
@@ -37,6 +37,11 @@ pipeline {
                     sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
                     sh "git push origin --tags"
                 }
+            }
+        }
+        stage("Maven push artifact to Nexus"){
+            steps{
+                sh "mvn deploy -Dmaven.test.skip "
             }
         }
         stage("Docker Build and Tag"){
