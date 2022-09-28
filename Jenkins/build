@@ -62,7 +62,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "${VERSION}")] , wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "${env.VERSION}")] , wait: false
             }
         }
     }
