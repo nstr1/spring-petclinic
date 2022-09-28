@@ -57,12 +57,12 @@ pipeline {
         }
         stage("Prune local Docker images") {
             steps{
-                sh "docker image prune -a"
+                sh "docker image prune -af"
             }
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: ${VERSION})] , wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "${VERSION}")] , wait: false
             }
         }
     }
