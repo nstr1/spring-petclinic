@@ -34,7 +34,7 @@ pipeline {
                 sh "git tag ${VERSION}"
                 
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
-                    sh "git remote set-url origin https://$user:$pass@github.com/$nstr1/project.git"
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/project.git"
                     sh "git push origin --tags"
                 }
             }
