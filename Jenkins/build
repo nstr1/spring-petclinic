@@ -12,19 +12,29 @@ pipeline {
     }
 
     stages {
-        stage("Check git tag, increment version, create new tag"){
+        stage("Set POM vesion according to git tag"){
             steps{
                 script{
-                    env.TAG = sh(returnStdout:  true, script: "git describe --tags --abbrev=0").trim()
-                }
-                sh "echo ${TAG}"
-                // sh "git ${TAG}"
-                // sh "git push origin --tags"      
+                    env.GIT_TAG = sh(returnStdout:  true, script: "git describe --tags --abbrev=0").trim()
+                    pom = readMavenPom file: 'pom.xml'
+                    pom.version = env.GIT_TAG
+                    writeMavenPom file: pomFile, model: pom
+                }        
             }
         }
         stage("Maven Test and Build"){
             steps{
-                sh "mvn clean package"
+                sh "mvn clean package -DbumpMinor"
+            }
+        }
+        stage("Update git tag"){
+            steps{
+                script{
+                    pom = readMavenPom file: 'pom.xml'
+                    env.VERSION = pom.version
+                }        
+                sh "git tag ${VERSION}"
+                sh "git push origin --tags"
             }
         }
         stage("Push .jar artifact to Nexus"){
@@ -34,10 +44,6 @@ pipeline {
         }
         stage("Docker Build and Tag"){
             steps{
-                script{
-                    pom = readMavenPom file: 'pom.xml'
-                    env.VERSION = pom.version
-                }
                 sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
             }
         }
