@@ -22,7 +22,7 @@ pipeline {
         }
         stage("Maven test and build"){
             steps{
-                sh "mvn clean packcage -Dmaven.test.skip -DbumpMinor"
+                sh "mvn clean package -Dmaven.test.skip -DbumpMinor"
             }
         }
         stage("Update git tag"){
