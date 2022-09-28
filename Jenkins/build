@@ -16,10 +16,8 @@ pipeline {
             steps{
                 script{
                     env.GIT_TAG = sh(returnStdout:  true, script: "git describe --tags --abbrev=0").trim()
-                    pom = readMavenPom file: 'pom.xml'
-                    pom.version = env.GIT_TAG
-                    writeMavenPom file: pomFile, model: pom
                 }        
+                sh "mvn versions:set -DnewVersion=${GIT_TAG}"
             }
         }
         stage("Maven Test and Build"){
