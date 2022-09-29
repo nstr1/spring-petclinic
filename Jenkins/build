@@ -17,12 +17,13 @@ pipeline {
         //         script{
         //             env.GIT_TAG = sh(returnStdout:  true, script: "git tag | sort -V | tail -1").trim()
         //         }        
+        //         sh "echo ${GIT_TAG}"
         //         sh "mvn versions:set -DnewVersion=${GIT_TAG}"
         //     }
         // }
         stage("Maven test, build and push to Nexus"){
             steps{
-                sh "mvn clean deploy -DbumpMinor -Dmaven.test.skip"
+                sh "mvn clean deploy -Dmaven.test.skip"
             }
         }
         // stage("Update git tag"){
