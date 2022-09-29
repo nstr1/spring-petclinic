@@ -10,7 +10,6 @@ pipeline {
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
-
     stages {
         stage("Set POM vesion according to git tag"){
             steps{
