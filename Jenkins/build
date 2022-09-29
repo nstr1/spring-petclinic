@@ -25,20 +25,20 @@ pipeline {
                 sh "mvn clean deploy -DbumpMinor"
             }
         }
-        stage("Update git tag"){
-            steps{
-                script{
-                    pom = readMavenPom file: 'pom.xml'
-                    env.VERSION = pom.version
-                }        
-                sh "git tag ${VERSION}"
+        // stage("Update git tag"){
+        //     steps{
+        //         script{
+        //             pom = readMavenPom file: 'pom.xml'
+        //             env.VERSION = pom.version
+        //         }        
+        //         sh "git tag ${VERSION}"
                 
-                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
-                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
-                    sh "git push origin --tags"
-                }
-            }
-        }
+        //         withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+        //             sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
+        //             sh "git push origin --tags"
+        //         }
+        //     }
+        // }
         stage("Docker Build and Tag"){
             steps{
                 sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
