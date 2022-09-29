@@ -12,34 +12,38 @@ pipeline {
     }
 
     stages {
-        // stage("Set POM vesion according to git tag"){
-        //     steps{
-        //         script{
-        //             env.GIT_TAG = sh(returnStdout:  true, script: "git tag | sort -V | tail -1").trim()
-        //         }        
-        //         sh "echo ${GIT_TAG}"
-        //         sh "mvn versions:set -DnewVersion=${GIT_TAG}"
-        //     }
-        // }
-        stage("Maven test, build and push to Nexus"){
+        stage("Set POM vesion according to git tag"){
+            steps{
+                script{
+                    env.GIT_TAG = sh(returnStdout:  true, script: "git describe --tags --abbrev=0").trim()
+                }        
+                sh "mvn versions:set -DnewVersion=${GIT_TAG}"
+            }
+        }
+        stage("Maven Test and Build"){
+            steps{
+                sh "mvn clean package -Dmaven.test.skip -DbumpMinor"
+            }
+        }
+        stage("Update git tag"){
+            steps{
+                script{
+                    pom = readMavenPom file: 'pom.xml'
+                    env.VERSION = pom.version
+                }        
+                sh "git tag ${VERSION}"
+                
+                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
+                    sh "git push origin --tags"
+                }
+            }
+        }
+        stage("Push .jar artifact to Nexus"){
             steps{
                 sh "mvn clean deploy -Dmaven.test.skip"
             }
         }
-        // stage("Update git tag"){
-        //     steps{
-        //         script{
-        //             pom = readMavenPom file: 'pom.xml'
-        //             env.VERSION = pom.version
-        //         }        
-        //         sh "git tag ${VERSION}"
-                
-        //         withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
-        //             sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
-        //             sh "git push origin --tags"
-        //         }
-        //     }
-        // }
         stage("Docker Build and Tag"){
             steps{
                 sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
@@ -58,7 +62,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "${env.VERSION}")] , wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "$VERSION")] , wait: false
             }
         }
     }
