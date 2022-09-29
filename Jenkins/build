@@ -22,7 +22,7 @@ pipeline {
         // }
         stage("Maven test, build and push to Nexus"){
             steps{
-                sh "mvn clean deploy -DbumpMinor"
+                sh "mvn clean deploy -DbumpMinor -Dmaven.test.skip"
             }
         }
         // stage("Update git tag"){
