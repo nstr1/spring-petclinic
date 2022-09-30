@@ -18,7 +18,6 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "mvn release:clean"
-                    sh "git tag -d ${VERSION}"
                     sh "mvn release:prepare -Darguments=\"-Dmaven.test.skip=true\" -DreleaseVersion=${VERSION} -DdevelopmentVersion=${DEV_VERSION} -Dusername=$user -Dpassword=$pass"
                     sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true\""
                 }
