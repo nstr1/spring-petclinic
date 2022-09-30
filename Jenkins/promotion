@@ -20,10 +20,12 @@ pipeline {
                     sh "mvn release:clean"
                     sh "mvn release:prepare -Darguments=\"-Dmaven.test.skip=true\" -DreleaseVersion=${VERSION} -DdevelopmentVersion=${DEV_VERSION} -Dusername=$user -Dpassword=$pass"
                     sh "mvn release:perform -Darguments=\"-Dmaven.test.skip=true -Dmaven.javadoc.skip=true\""
+                    sh "git push origin --tags"
                 }
             }
         }
     }
+
     post {
         success {
             slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
