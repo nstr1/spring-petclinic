@@ -19,9 +19,9 @@ pipeline {
                 sh "mvn versions:set -DnewVersion=${GIT_TAG}"
             }
         }
-        stage("Maven test build and push to Nexus "){
+        stage("Maven test build and push to Nexus (increment minor version)"){
             steps{
-                sh "mvn clean deploy -Dmaven.test.skip -DbumpMinor"
+                sh "mvn clean deploy -DbumpMinor"
             }
         }
         stage("Update git tag"){

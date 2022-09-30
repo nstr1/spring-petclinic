@@ -12,10 +12,10 @@ pipeline {
     }
 
     stages {
-        stage("Release") {
+        stage("Release and push to Nexus") {
             steps {
-                sh "mvn -B release:prepare -DreleaseVersion=${VERSION}"
-                sh "mvn -B release:perform"
+                sh "mvn release:prepare -Dmaven.test.skip=true -DreleaseVersion=${VERSION}"
+                sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true -Dmaven.test.skip\""
             }
         }
     }
