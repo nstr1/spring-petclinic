@@ -5,29 +5,42 @@ pipeline {
         maven "M3"
     }
     environment {
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
         NEXUS_URL = "${NEXUS_URL}" 
-        NEXUS_REPOSITORY = "image-repo"
-        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
+        GITHUB_CREDENTIAL_ID = "${GITHUB_CREDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
-
     stages {
-        stage("Maven Test and Build"){
+        stage("Set POM vesion according to git tag"){
             steps{
-                sh "mvn clean package"
+                script{
+                    env.GIT_TAG = sh(returnStdout:  true, script: "git tag | sort -V | tail -1").trim()
+                }        
+                sh "mvn versions:set -DnewVersion=${GIT_TAG}"
             }
         }
-        stage("Increment artifact version(minor)"){
+        stage("Maven test build and push to Nexus (increment minor version)"){
             steps{
-                sh "mvn validate -DbumpMinor"
+                sh "mvn clean deploy -DbumpMinor"
+            }
+        }
+        stage("Update git tag"){
+            steps{
+                script{
+                    pom = readMavenPom file: 'pom.xml'
+                    env.VERSION = pom.version
+                }        
+                sh "git tag ${VERSION}"
+                
+                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
+                    sh "git push origin --tags"
+                }
             }
         }
         stage("Docker Build and Tag"){
             steps{
-                sh "docker image build -t $NEXUS_URL/petclinic:\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) ."
+                sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
             }
         }
         stage("Push Docker image to Nexus repository") {
@@ -36,19 +49,15 @@ pipeline {
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
-        stage("Push Maven Snapshot to Nexus repository") {
-            steps{
-                sh "mvn deploy -Dmaven.test.skip=true"
-            }
-        }
         stage("Prune local Docker images") {
             steps{
-                sh "docker image prune -a"
+                sh "docker image prune -af"
             }
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'deploy'
+                echo "version is: ${VERSION}"
+                build job: 'petclinic-deploy', parameters:[string(name: 'VERSION', value: "${VERSION}")] , wait: false
             }
         }
     }

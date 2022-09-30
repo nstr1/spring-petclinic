@@ -1,0 +1,34 @@
+pipeline {
+    agent { label 'agent1' }  
+
+    tools {
+        maven "M3"
+    }
+    environment {
+        NEXUS_URL = "${NEXUS_URL}" 
+        DOCKER_USERNAME = "${DOCKER_USERNAME}"
+        DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
+        VERSION = "${params.VERSION}"
+    }
+
+    stages {
+        stage("Release and push to Nexus") {
+            steps {
+                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
+                    sh "mvn release:clean"
+                    sh "mvn release:prepare -Dmaven.test.skip=true -DreleaseVersion=${VERSION}"
+                    sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true -Dmaven.test.skip\""
+                }
+            }
+        }
+    }
+    post {
+        success {
+            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+        failure {
+            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+    }
+}
