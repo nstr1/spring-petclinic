@@ -10,6 +10,7 @@ pipeline {
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
         GITHUB_CREDENTIAL_ID = "${GITHUB_CREDENTIAL_ID}"
         VERSION = "${params.VERSION}"
+        DEV_VERSION = "${params.DEV_VERSION}"
         
     }
     stages {
@@ -18,7 +19,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "mvn release:clean"
                     sh "git tag -d ${VERSION}"
-                    sh "mvn release:prepare -DreleaseVersion=${VERSION} -DdevelopmentVersion=${VERSION}-SNAPSHOT -Dtag=${VERSION} -DpushChanges=false -Dusername=$user -Dpassword=$pass"
+                    sh "mvn release:prepare -DreleaseVersion=${VERSION} -DdevelopmentVersion=${DEV_VERSION} -Dtag=${VERSION} -Dusername=$user -Dpassword=$pass"
                     sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true\""
                 }
             }
