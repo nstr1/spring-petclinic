@@ -19,6 +19,11 @@ pipeline {
                 sh "mvn versions:set -DnewVersion=${GIT_TAG}"
             }
         }
+        stage("Test deploy job"){
+            steps{
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "${GIT_TAG}")] , wait: false
+            }
+        }
         stage("Maven test build and push to Nexus "){
             steps{
                 sh "mvn clean deploy -Dmaven.test.skip -DbumpMinor"
@@ -56,7 +61,7 @@ pipeline {
         }
         stage("Trigger deploy job"){
             steps{
-                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "$VERSION")] , wait: false
+                 build job: 'petclinic-deploy', parameters:[string(name: 'version', value: "${VERSION}")] , wait: false
             }
         }
     }
