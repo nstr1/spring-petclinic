@@ -5,10 +5,13 @@ pipeline {
         maven "M3"
     }
     environment {
+        
         NEXUS_URL = "${NEXUS_URL}" 
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
+        GITHUB_CREDENTIAL_ID = "${GITHUB_CREDENTIAL_ID}"
         VERSION = "${params.VERSION}"
+        
     }
 
     stages {
