@@ -5,40 +5,26 @@ pipeline {
         maven "M3"
     }
     environment {
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
         NEXUS_URL = "${NEXUS_URL}" 
-        NEXUS_REPOSITORY = "image-repo"
-        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
+        VERSION = "${params.VERSION}"
     }
 
     stages {
-        stage("Maven perform a release"){
-            steps{
-                sh "mvn release:perform"
+        stage("Build & Deploy SNAPSHOT") {
+            steps {
+                sh "mvn -B deploy"
             }
         }
-        stage("Docker Build and Tag"){
-            steps{
-                sh "docker image build -t $NEXUS_URL/petclinic:\$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) ."
+
+        stage("Release") {
+            when {
+                expression { params.RELEASE }
             }
-        }
-        stage("Push Docker image to Nexus repository") {
-            steps{
-                sh "docker login $NEXUS_URL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
-                sh "docker push $NEXUS_URL/petclinic --all-tags"
-            }
-        }
-        stage("Push Maven artifacts to Nexus repository") {
-            steps{
-                sh "mvn deploy -Dmaven.test.skip=true"
-            }
-        }
-        stage("Prune local Docker images") {
-            steps{
-                sh "docker image prune -a"
+            steps {
+                sh "mvn -B release:prepare"
+                sh "mvn -B release:perform"
             }
         }
     }
