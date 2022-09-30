@@ -17,7 +17,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
                     sh "mvn release:clean"
-                    sh "mvn release:prepare -Dmaven.test.skip=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${VERSION}-SNAPSHOT"
+                    sh "mvn release:prepare -Dmaven.test.skip=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${VERSION}-SNAPSHOT -Dtag=${VERSION}"
                     sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true -Dmaven.test.skip\""
                 }
             }
