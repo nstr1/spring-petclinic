@@ -8,9 +8,10 @@ pipeline {
                     script {
                         env.VERSION = params.VERSION
                     }
-                    sh "echo ${params.VERSION_NUMBER}"
+                    sh "echo ${VERSION}"
+                    sh "echo ${params.VERSION}"
                     sh "echo '${VAULT_PASS}' > .secret.txt"
-                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt --extra-vars \"version=${params.VERSION_NUMBER}\""
+                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt --extra-vars \"version=${params.VERSION}\""
                     sh "rm .secret.txt"
                 }
             }
