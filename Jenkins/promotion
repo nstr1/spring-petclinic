@@ -16,7 +16,9 @@ pipeline {
         stage("Release and push to Nexus") {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
-                    sh "mvn release:clean release:prepare -DreleaseVersion=${VERSION} -DdevelopmentVersion=${VERSION}-SNAPSHOT -Dtag=${VERSION} -DpushChanges=false -Dusername=$user -Dpassword=$pass"
+                    sh "mvn release:clean"
+                    sh "git tag -d ${VERSION}"
+                    sh "mvn release:prepare -DreleaseVersion=${VERSION} -DdevelopmentVersion=${VERSION}-SNAPSHOT -Dtag=${VERSION} -DpushChanges=false -Dusername=$user -Dpassword=$pass"
                     sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true\""
                 }
             }
