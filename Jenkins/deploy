@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'agent1' }  
 
-s {
+    stages {
         stage("Deploy to app-server"){
             steps{
                 ws('/home/jenkins/ansible') {
