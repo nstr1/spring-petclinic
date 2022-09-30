@@ -14,8 +14,11 @@ pipeline {
     stages {
         stage("Release and push to Nexus") {
             steps {
-                sh "mvn release:prepare -Dmaven.test.skip=true -DreleaseVersion=${VERSION}"
-                sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true -Dmaven.test.skip\""
+                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
+                    sh "mvn release:prepare -Dmaven.test.skip=true -DreleaseVersion=${VERSION}"
+                    sh "mvn release:perform -Darguments=\"-Dmaven.javadoc.skip=true -Dmaven.test.skip\""
+                }
             }
         }
     }
