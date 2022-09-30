@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'agent1' }  
     environment {
-        VERSION = params.VERSION
+        VERSION = "${params.VERSION}"
     }
     stages {
         stage("Deploy to app-server"){
