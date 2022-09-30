@@ -17,10 +17,10 @@
        <id>nexus</id>
        <url>http://10.0.0.66:8081/repository/maven-snapshots/</url>
     </snapshotRepository>
-      <repository>
-         <id>nexus-releases</id>
-         <url>http://10.0.0.66:8081/repository/maven-releases/</url>
-      </repository>
+    <repository>
+        <id>nexus-releases</id>
+        <url>http://10.0.0.66:8081/repository/maven-releases/</url>
+    </repository>
  </distributionManagement>
 
  <scm>
@@ -148,6 +148,9 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
         <version>1.5.1</version>
         <executions>
            <execution>
