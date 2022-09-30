@@ -12,7 +12,6 @@ pipeline {
         VERSION = "${params.VERSION}"
         
     }
-
     stages {
         stage("Release and push to Nexus") {
             steps {
