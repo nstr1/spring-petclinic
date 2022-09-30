@@ -32,6 +32,10 @@
 
   <properties>
 
+    <properties>
+      <project.scm.id>my-scm-server</project.scm.id>
+    </properties>
+
     <!-- Generic properties -->
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
