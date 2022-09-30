@@ -13,9 +13,6 @@ pipeline {
 
     stages {
         stage("Release") {
-            when {
-                expression { params.RELEASE }
-            }
             steps {
                 sh "mvn -B release:prepare -DreleaseVersion=${VERSION}"
                 sh "mvn -B release:perform"
