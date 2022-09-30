@@ -32,9 +32,9 @@
 
   <properties>
 
-    <properties>
-      <project.scm.id>my-scm-server</project.scm.id>
-    </properties>
+
+    <project.scm.id>my-scm-server</project.scm.id>
+
 
     <!-- Generic properties -->
     <java.version>1.8</java.version>
