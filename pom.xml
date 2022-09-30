@@ -24,17 +24,15 @@
  </distributionManagement>
 
  <scm>
-  <connection>scm:git:https://github.com/nstr1/spring-petclinic.git</connection>
-  <url>http://github.com/nstr1/spring-petclinic</url>
-  <developerConnection>scm:git:https://github.com/nstr1/spring-petclinic.git</developerConnection>
-  <tag>v3.0.0</tag>
-  </scm>
+    <connection>scm:git:https://github.com/nstr1/spring-petclinic.git</connection>
+    <url>http://github.com/nstr1/spring-petclinic</url>
+    <developerConnection>scm:git:https://github.com/nstr1/spring-petclinic.git</developerConnection>
+    <tag>v3.0.0</tag>
+ </scm>
 
   <properties>
 
-
     <project.scm.id>my-scm-server</project.scm.id>
-
 
     <!-- Generic properties -->
     <java.version>1.8</java.version>
