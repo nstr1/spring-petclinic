@@ -15,9 +15,9 @@ pipeline {
     }
 
     stages {
-        stage("Maven Test and Build"){
+        stage("Maven perform a release"){
             steps{
-                sh "mvn clean package"
+                sh "mvn release:perform"
             }
         }
         stage("Docker Build and Tag"){
@@ -31,7 +31,7 @@ pipeline {
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
-        stage("Push Maven Snapshot to Nexus repository") {
+        stage("Push Maven artifacts to Nexus repository") {
             steps{
                 sh "mvn deploy -Dmaven.test.skip=true"
             }
@@ -39,11 +39,6 @@ pipeline {
         stage("Prune local Docker images") {
             steps{
                 sh "docker image prune -a"
-            }
-        }
-        stage("Trigger deploy job"){
-            steps{
-                 build job: 'deploy'
             }
         }
     }
