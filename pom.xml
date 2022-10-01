@@ -161,7 +161,7 @@
         <configuration>
            <serverId>nexus</serverId>
            <nexusUrl>http://10.0.0.66:8081/repository/maven-snapshots</nexusUrl>
-           <skip>true</skip>
+           <skipStaging>true</skipStaging>
         </configuration>
      </plugin>
       <plugin>
