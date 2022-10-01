@@ -19,9 +19,23 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
                     sh "mvn release:prepare -Darguments=\"-Dmaven.test.skip=true\" -Dtag=${VERSION} -DreleaseVersion=${VERSION} -DdevelopmentVersion=${DEV_VERSION} -Dusername=$user -Dpassword=$pass"
                     sh "mvn release:perform -Darguments=\"-Dmaven.test.skip=true -Dmaven.javadoc.skip=true\""
-                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
-                    sh "git push origin --tags"
                 }
+            }
+        }
+        stage("Docker build and tag") {
+            steps {
+                sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
+            }
+        }
+        stage("Push Docker image to Nexus repository") {
+            steps{
+                sh "docker login $NEXUS_URL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
+                sh "docker push $NEXUS_URL/petclinic --all-tags"
+            }
+        }
+        stage("Prune local Docker images") {
+            steps{
+                sh "docker image prune -af"
             }
         }
     }
