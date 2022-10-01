@@ -1,0 +1,26 @@
+pipeline {
+    agent { label 'agent1' }  
+    environment {
+        VERSION = "${params.VERSION}"
+    }
+    stages {
+        stage("Deploy to app-server"){
+            steps{
+                ws('/home/jenkins/ansible') {
+                    sh "echo ${VERSION}"
+                    sh "echo '${VAULT_PASS}' > .secret.txt"
+                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt --extra-vars \"version=${VERSION}\""
+                    sh "rm .secret.txt"
+                }
+            }
+        }
+    }
+    post {
+        success {
+            slackSend color: "good", message:"Build successful - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+        failure {
+            slackSend color: "danger", message:"Build failed  - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        }
+    }
+}

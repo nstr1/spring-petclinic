@@ -5,39 +5,59 @@ pipeline {
         maven "M3"
     }
     environment {
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
         NEXUS_URL = "${NEXUS_URL}" 
-        NEXUS_REPOSITORY = "image-repo"
-        NEXUS_CREDENTIAL_ID = "${NEXUS_CREDENTIAL_ID}"
+        GITHUB_CREDENTIAL_ID = "${GITHUB_CREDENTIAL_ID}"
         DOCKER_USERNAME = "${DOCKER_USERNAME}"
         DOCKER_PASSWORD = "${DOCKER_PASSWORD}"
     }
-
     stages {
-        stage("Maven Build"){
+        stage("Set POM vesion according to git tag"){
             steps{
-                sh "mvn clean package -Dmaven.test.skip -Dcheckstyle.skip"
+                script{
+                    env.GIT_TAG = sh(returnStdout:  true, script: "git tag | sort -V | tail -1").trim()
+                }        
+                sh "mvn versions:set -DnewVersion=${GIT_TAG}"
+            }
+        }
+        stage("Maven test build and push to Nexus (increment minor version)"){
+            steps{
+                sh "mvn clean deploy -DbumpMinor"
+            }
+        }
+        stage("Update git tag"){
+            steps{
+                script{
+                    pom = readMavenPom file: 'pom.xml'
+                    env.VERSION = pom.version
+                }        
+                sh "git tag ${VERSION}"
+                
+                withCredentials([usernamePassword(credentialsId: env.GITHUB_CREDENTIAL_ID, passwordVariable: 'pass', usernameVariable: 'user')]) {
+                    sh "git remote set-url origin https://$user:$pass@github.com/$user/spring-petclinic.git"
+                    sh "git push origin --tags"
+                }
             }
         }
         stage("Docker Build and Tag"){
             steps{
-                sh "docker image build -t $NEXUS_URL/petclinic:latest -t $NEXUS_URL/petclinic:\$(git log -1 --pretty=%h) ."
+                sh "docker image build -t $NEXUS_URL/petclinic:${VERSION} ."
             }
         }
-        stage("Push to Nexus repository") {
+        stage("Push Docker image to Nexus repository") {
             steps{
                 sh "docker login $NEXUS_URL -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD"
                 sh "docker push $NEXUS_URL/petclinic --all-tags"
             }
         }
-        stage("Deploy to app-server"){
+        stage("Prune local Docker images") {
             steps{
-                ws('/home/jenkins/ansible') {
-                    sh "echo '${VAULT_PASS}' > .secret.txt"
-                    sh "ansible-playbook playbooks/app-deploy.yaml  --vault-password-file .secret.txt"
-                    sh "rm .secret.txt"
-                }
+                sh "docker image prune -af"
+            }
+        }
+        stage("Trigger deploy job"){
+            steps{
+                echo "version is: ${VERSION}"
+                build job: 'petclinic-deploy', parameters:[string(name: 'VERSION', value: "${VERSION}")] , wait: false
             }
         }
     }
